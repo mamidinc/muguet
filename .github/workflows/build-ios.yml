@@ -1,18 +1,31 @@
-  - name: Install Rust toolchain
-    run: |
-      rustup toolchain install 1.98.1
-      rustup target add aarch64-apple-ios --toolchain 1.98.1
+name: Build Muguet IPA
 
-  - name: Install xcodegen
-    run: brew install xcodegen
+on:
+  workflow_dispatch:
 
-  - name: Build IPA
-    run: |
-      FREE=1 BUNDLE_ID=app.mamidinc.muguet ./make-ios.sh --ipa
+jobs:
+  build:
+    runs-on: macos-26
 
-  - name: Upload IPA
-    uses: actions/upload-artifact@v4
-    with:
-      name: Muguet-IPA
-      path: build/Muguet.ipa
-      if-no-files-found: error
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.98.1
+          rustup target add aarch64-apple-ios --toolchain 1.98.1
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Build IPA
+        run: |
+          FREE=1 BUNDLE_ID=app.mamidinc.muguet ./make-ios.sh game.zip --ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Muguet-IPA
+          path: build/Muguet.ipa
+          if-no-files-found: error
